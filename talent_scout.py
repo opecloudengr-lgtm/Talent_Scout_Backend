@@ -100,6 +100,15 @@ def post_user():
     db.session.commit()
     return jsonify({"message": "Sign-Up successful"}), 201
 
+@app.route("/users", methods=["GET"])
+def get_users():
+
+    users = User.query.all()
+
+    if not users:
+        return jsonify({"message": "Users not found"}), 404
+    return jsonify(users_schema.dump(users)), 200
+
 # =========================
 #           RUN APP
 # =========================
