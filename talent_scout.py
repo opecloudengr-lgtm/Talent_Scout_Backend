@@ -102,13 +102,17 @@ def post_user():
 
 @app.route("/users", methods=["GET"])
 def get_users():
-
     users = User.query.all()
-
     if not users:
         return jsonify({"message": "Users not found"}), 404
     return jsonify(users_schema.dump(users)), 200
 
+@app.route("/users/<string:user_id>", methods=["GET"])
+def get_user(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    return jsonify(user_schema.dump(user)), 200
 # =========================
 #           RUN APP
 # =========================
