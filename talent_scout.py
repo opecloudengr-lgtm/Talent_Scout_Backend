@@ -175,6 +175,15 @@ def get_timeline(timeline_id):
     if not timeline:
         return jsonify({"message": "Timeline not found"}), 404
     return jsonify(timeline_schema.dump(timeline)), 200
+
+@app.route("/timeline/<string:timeline_id>", methods=["DELETE"])
+def delete_timeline(timeline_id):
+    timeline = db.session.get(Timeline, timeline_id)
+    if not timeline:
+        return jsonify({"message": "Timeline not found"}), 404
+    db.session.delete(timeline)
+    db.session.commit()
+    return jsonify({"message": "Timeline deleted successfully"}), 200
 # =========================
 #           RUN APP
 # =========================
