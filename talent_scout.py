@@ -169,6 +169,12 @@ def get_timelines(user_id):
         return jsonify({"message": "Timeline not found"}), 404
     return jsonify(timelines_schema.dump(timelines)), 200
 
+@app.route("/timeline/<string:timeline_id>", methods=["GET"])
+def get_timeline(timeline_id):
+    timeline = db.session.get(Timeline, timeline_id)
+    if not timeline:
+        return jsonify({"message": "Timeline not found"}), 404
+    return jsonify(timeline_schema.dump(timeline)), 200
 # =========================
 #           RUN APP
 # =========================
