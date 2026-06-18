@@ -162,6 +162,13 @@ def create_timeline(user_id):
 
     return jsonify({"message": "Timeline created successfully"}), 201
 
+@app.route("/timelines/<string:user_id>", methods=["GET"])
+def get_timelines(user_id):
+    timelines = Timeline.query.filter_by(user_id=user_id).all()
+    if not timelines:
+        return jsonify({"message": "Timeline not found"}), 404
+    return jsonify(timelines_schema.dump(timelines)), 200
+
 # =========================
 #           RUN APP
 # =========================
