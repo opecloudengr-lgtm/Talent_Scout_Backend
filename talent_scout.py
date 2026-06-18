@@ -113,6 +113,32 @@ def get_user(user_id):
     if not user:
         return jsonify({"message": "User not found"}), 404
     return jsonify(user_schema.dump(user)), 200
+
+@app.route("/users/<string:user_id>", methods=["PATCH"])
+def update_user(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    data = request.get_json()
+    try:
+        validated_data = update_user_schema.load(data)
+    except ValidationError as err:
+        return jsonify({"errors": err.messages}), 400
+    if "first_name" in validated_data:
+        user.first_name = validated_data["first_name"]
+    if "last_name" in validated_data:
+        user.last_name = validated_data["last_name"]
+    if "email" in validated_data:
+        user.email = validated_data["email"]
+    if "current_position" in validated_data:
+        user.current_position = validated_data["current_position"]
+    if "company" in validated_data:
+        user.company = validated_data["company"]
+    if "password" in validated_data:
+        user.password = validated_data["password"]
+    db.session.commit()
+    return jsonify({"message": "User updated successfully"}), 200
+
 # =========================
 #           RUN APP
 # =========================
