@@ -140,6 +140,29 @@ def update_user(user_id):
     return jsonify({"message": "User updated successfully"}), 200
 
 # =========================
+#       TIMELINE ROUTES
+# =========================
+
+@app.route("/timelines/<string:user_id>", methods=["POST"])
+def create_timeline(user_id):
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    data = request.get_json()
+    try:
+        validated_data = timeline_schema.load(data)
+    except ValidationError as err:
+        return jsonify({"errors": err.messages}), 400
+    new_timeline = Timeline(
+        content=validated_data["content"],
+        user_id=user_id
+    )
+    db.session.add(new_timeline)
+    db.session.commit()
+
+    return jsonify({"message": "Timeline created successfully"}), 201
+
+# =========================
 #           RUN APP
 # =========================
 
