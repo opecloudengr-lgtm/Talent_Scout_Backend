@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from marshmallow import Schema, fields, ValidationError
 from marshmallow.validate import Length
+from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 
 app = Flask(__name__)
@@ -94,11 +95,21 @@ def post_user():
         }), 409
     new_user = User(
         email=validated_data["email"],
-        password=validated_data["password"]
+        password=generate_password_hash(validated_data["password"])
     )
     db.session.add(new_user)
     db.session.commit()
     return jsonify({"message": "Sign-Up successful"}), 201
+
+@app.route("/users/login", methods=["POST"])
+def login_user():
+    data = request.get_json()
+    user = User.query.filter_by(email=data["email"]).first()
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    if not check_password_hash(user.password, data["password"]):
+        return jsonify({"message": "Invalid password"}), 401
+    return jsonify({"message": "Login successful"}), 200
 
 @app.route("/users", methods=["GET"])
 def get_users():
